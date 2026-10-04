@@ -1,45 +1,57 @@
-# AI Agent with Tools
+# AI Task Agent
 
-This project was built as part of my Generative AI Internship at Codomax Digital Solutions.
+An AI Agent built as part of the **Codomax Generative AI Internship – Module 5: AI Agents, Tools & Automation**.
 
-## Project Overview
+The project demonstrates how an AI agent can understand a user's request, decide whether a tool is required, call the appropriate tool, process the result, and generate a final response.
 
-This project demonstrates the basic concept of an AI agent.
+## Features
 
-Unlike a simple chatbot, the application can use tools to perform specific tasks.
+* LLM-powered AI Agent
+* Hugging Face Inference API
+* Function / Tool Calling
+* Calculator tool
+* Text Length tool
+* Agent decision-making
+* Conversation state
+* Multi-step tool execution
+* Error handling
+* Gradio web interface
 
-The agent currently supports:
+## Agent Workflow
 
-- Normal AI conversations
-- Calculator tool
-- Current time tool
-- Hugging Face LLM integration
-- Gradio web interface
+```text
+User Task
+    ↓
+Understand Task
+    ↓
+Decide Action
+    ↓
+Choose Tool
+    ↓
+Execute Tool
+    ↓
+Process Result
+    ↓
+Generate Final Response
+```
 
-## Architecture
+## Available Tools
 
-User
-↓
-AI Agent
-↓
-Tool Selection
-├── Calculator Tool
-├── Time Tool
-└── LLM Response
+### 1. Calculator
 
-## Technologies Used
+The calculator tool can perform:
 
-- Python
-- Hugging Face Inference API
-- Llama 3.1 8B Instruct
-- Gradio
-- python-dotenv
+* Addition
+* Subtraction
+* Multiplication
+* Division
 
-## How to Run
+Example:
 
-1. Clone the repository.
-2. Create a Python virtual environment.
-3. Install dependencies:
+```text
+User: What is 125 + 375?
 
-```bash
-pip install -r requirements.txt
+Agent → Calculator Tool → 500
+
+Final Answ
+```
