@@ -38,13 +38,10 @@ MODEL_NAME = "meta-llama/Llama-3.1-8B-Instruct"
 
 
 # =========================================================
-# 4. TOOLS
+# 4. TOOL 1 - CALCULATOR
 # =========================================================
 
 def calculator(a, b, operation):
-    """
-    Performs a mathematical calculation.
-    """
 
     if operation == "add":
         return a + b
@@ -66,16 +63,17 @@ def calculator(a, b, operation):
         return "Error: Unknown operation."
 
 
+# =========================================================
+# 5. TOOL 2 - TEXT LENGTH
+# =========================================================
+
 def text_length(text):
-    """
-    Counts the number of characters in text.
-    """
 
     return len(text)
 
 
 # =========================================================
-# 5. DESCRIBE TOOLS TO THE LLM
+# 6. DESCRIBE TOOLS TO THE LLM
 # =========================================================
 
 tools = [
@@ -86,9 +84,8 @@ tools = [
             "name": "calculator",
             "description": (
                 "Perform mathematical calculations. "
-                "Use this tool when the user asks for "
-                "addition, subtraction, multiplication, "
-                "or division."
+                "Use this tool for addition, subtraction, "
+                "multiplication, or division."
             ),
             "parameters": {
                 "type": "object",
@@ -154,7 +151,7 @@ tools = [
 
 
 # =========================================================
-# 6. EXECUTE TOOLS
+# 7. EXECUTE TOOLS
 # =========================================================
 
 def execute_tool(tool_name, arguments):
@@ -185,43 +182,39 @@ def execute_tool(tool_name, arguments):
 
 
 # =========================================================
-# 7. AGENT
+# 8. AI AGENT
 # =========================================================
 
 def run_agent(user_input, conversation_history=None):
 
-    # -----------------------------------------------------
-    # Create state
-    # -----------------------------------------------------
-
     messages = []
 
-    # -----------------------------------------------------
     # Add previous conversation to state
-    # -----------------------------------------------------
-
     if conversation_history:
 
-        for user_message, assistant_message in conversation_history:
+        for item in conversation_history:
 
-            messages.append(
-                {
-                    "role": "user",
-                    "content": user_message
-                }
-            )
+            if isinstance(item, (list, tuple)) and len(item) == 2:
 
-            messages.append(
-                {
-                    "role": "assistant",
-                    "content": assistant_message
-                }
-            )
+                user_message, assistant_message = item
 
-    # -----------------------------------------------------
+                if user_message:
+                    messages.append(
+                        {
+                            "role": "user",
+                            "content": user_message
+                        }
+                    )
+
+                if assistant_message:
+                    messages.append(
+                        {
+                            "role": "assistant",
+                            "content": assistant_message
+                        }
+                    )
+
     # Add current user request
-    # -----------------------------------------------------
-
     messages.append(
         {
             "role": "user",
@@ -238,10 +231,6 @@ def run_agent(user_input, conversation_history=None):
 
     for _ in range(max_iterations):
 
-        # -------------------------------------------------
-        # Ask the LLM what to do
-        # -------------------------------------------------
-
         response = client.chat.completions.create(
             model=MODEL_NAME,
             messages=messages,
@@ -253,26 +242,17 @@ def run_agent(user_input, conversation_history=None):
         assistant_message = response.choices[0].message
 
 
-        # -------------------------------------------------
         # No tool required
-        # -------------------------------------------------
-
         if not assistant_message.tool_calls:
 
             return assistant_message.content
 
 
-        # -------------------------------------------------
-        # Agent decided to use a tool
-        # -------------------------------------------------
-
+        # Save assistant tool request
         messages.append(assistant_message)
 
 
-        # -------------------------------------------------
-        # Execute every requested tool
-        # -------------------------------------------------
-
+        # Execute requested tools
         for tool_call in assistant_message.tool_calls:
 
             tool_name = tool_call.function.name
@@ -288,20 +268,14 @@ def run_agent(user_input, conversation_history=None):
                 arguments = {}
 
 
-            # ---------------------------------------------
-            # Execute tool
-            # ---------------------------------------------
-
+            # Execute the selected tool
             result = execute_tool(
                 tool_name,
                 arguments
             )
 
 
-            # ---------------------------------------------
-            # Give result back to the LLM
-            # ---------------------------------------------
-
+            # Send tool result back to LLM
             messages.append(
                 {
                     "role": "tool",
@@ -311,10 +285,6 @@ def run_agent(user_input, conversation_history=None):
             )
 
 
-    # =====================================================
-    # SAFETY LIMIT
-    # =====================================================
-
     return (
         "The agent reached its maximum number of steps "
         "without completing the task."
@@ -322,7 +292,7 @@ def run_agent(user_input, conversation_history=None):
 
 
 # =========================================================
-# 8. GRADIO CHAT FUNCTION
+# 9. GRADIO CHAT FUNCTION
 # =========================================================
 
 def chat(message, history):
@@ -345,16 +315,16 @@ def chat(message, history):
 
 
 # =========================================================
-# 9. GRADIO INTERFACE
+# 10. GRADIO INTERFACE
 # =========================================================
 
 demo = gr.ChatInterface(
     fn=chat,
     title="AI Task Agent",
     description=(
-        "An AI agent that can understand requests, "
-        "choose tools, execute them, and use the "
-        "results to generate an answer."
+        "An AI agent that understands requests, "
+        "chooses tools, executes them, and uses "
+        "the results to generate an answer."
     ),
     examples=[
         "What is 125 + 375?",
@@ -367,7 +337,7 @@ demo = gr.ChatInterface(
 
 
 # =========================================================
-# 10. START APPLICATION
+# 11. START APPLICATION
 # =========================================================
 
 if __name__ == "__main__":
