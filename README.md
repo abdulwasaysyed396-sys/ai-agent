@@ -1,7 +1,5 @@
 # AI Task Agent
 
-An AI Agent built as part of the **Codomax Generative AI Internship – Module 5: AI Agents, Tools & Automation**.
-
 The project demonstrates how an AI agent can understand a user's request, decide whether a tool is required, call the appropriate tool, process the result, and generate a final response.
 
 ## Features
